@@ -1,12 +1,24 @@
 import 'dart:convert';
-
 import 'package:datematic/tools/app_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:data_connection_checker/data_connection_checker.dart';
 
 class ApiService {
+  // This is for the google sign in
+  static GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: <String>[
+      'email',
+      'https://www.googleapis.com/auth/contacts.readonly',
+    ],
+  );
+
+  // This user details is sent to this url after signing in
+  static String _url = "https://domapp-f603e.firebaseapp.com/api/v1/signup";
+
   static Future login(
       {String email, String password, BuildContext context}) async {
     try {
@@ -21,17 +33,65 @@ class ApiService {
   }
 
   static Future<String> signUp({String email, String password}) async {
-    String url = "https://domapp-f603e.firebaseapp.com/api/v1/signup";
     try {
-      FirebaseUser user = (await auth.createUserWithEmailAndPassword(
+      final FirebaseUser user = (await auth.createUserWithEmailAndPassword(
               email: email, password: password))
           .user;
+      // this returns string after sending message to the server
+      String response = await sendToApi(user);
+      return response;
+    } on PlatformException catch (e) {
+      return e.message;
+    }
+  }
+
+  static Future<String> googleSignIn() async {
+    // This checks if the network connection is strong enough to carry out the sign in
+    bool result = await DataConnectionChecker().hasConnection;
+    if (result == false) {
+      return poor;
+    }
+
+    try {
+      // This sign in the user through their google account
+      final GoogleSignInAccount googleSignInAccount =
+          await _googleSignIn.signIn();
+      print(googleSignInAccount.email);
+      final GoogleSignInAuthentication googleSignInAuthentication =
+          await googleSignInAccount.authentication;
+
+      final AuthCredential credential = GoogleAuthProvider.getCredential(
+        accessToken: googleSignInAuthentication.accessToken,
+        idToken: googleSignInAuthentication.idToken,
+      );
+
+      //This connects google sign in with firebase auth.
+      final FirebaseUser user =
+          (await auth.signInWithCredential(credential)).user;
+
+      // this returns string after sending message to the server
+      String response = await sendToApi(user);
+      return response;
+    } on PlatformException catch (e) {
+      return e.message;
+    }
+  }
+
+  static Future<void> handleSignOut() async {
+    await _googleSignIn.signOut();
+    await auth.signOut();
+  }
+
+ 
+// this method is called in order to send user details to the API
+  static Future<String> sendToApi(FirebaseUser user) async {
+    try {
       String token = await firebaseMessaging.getToken();
       if (user != null && token != null) {
         http.Response response = await http.post(
-          url,
+          _url,
           body: json.encode(
-            {"email": email, "fcm_token": token, "uid": user.uid},
+            {"email": user.email, "fcm_token": token, "uid": user.uid},
           ),
         );
         if (response.statusCode == 200) {
@@ -42,8 +102,8 @@ class ApiService {
       } else {
         return error;
       }
-    } on PlatformException catch (e) {
-      return e.message;
+    } catch (e) {
+      return e.toString();
     }
   }
 }

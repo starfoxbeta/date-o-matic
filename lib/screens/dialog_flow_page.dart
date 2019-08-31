@@ -1,5 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:datematic/images.dart';
+import 'package:datematic/screens/menu.dart';
+import 'package:datematic/tools/app_provider.dart';
+import 'package:datematic/tools/remote_configuration.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dialogflow/dialogflow_v2.dart';
+import 'package:provider/provider.dart';
 
 class HomePageDialogflow extends StatefulWidget {
   @override
@@ -9,6 +15,7 @@ class HomePageDialogflow extends StatefulWidget {
 class _HomePageDialogflow extends State<HomePageDialogflow> {
   final List<ChatMessage> _messages = <ChatMessage>[];
   final TextEditingController _textController = new TextEditingController();
+  GlobalKey<ScaffoldState> _globalKey = GlobalKey();
 
   Widget _buildTextComposer() {
     return new IconTheme(
@@ -70,42 +77,74 @@ class _HomePageDialogflow extends State<HomePageDialogflow> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      body: new Column(children: <Widget>[
-        SizedBox(
-          height: 20.0,
-        ),
-        Align(
-          alignment: Alignment.topLeft,
+    var config = Provider.of<AppProvider>(context);
+    return WillPopScope(
+      onWillPop: () {
+        return;
+      },
+      child: Scaffold(
+        key: _globalKey,
+        appBar: PreferredSize(
+          preferredSize: Size(MediaQuery.of(context).size.width, 70),
           child: Container(
-            child: IconButton(
-              icon: Icon(
-                Icons.navigate_before,
-                color: Colors.blue,
-                size: 40.0,
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-              },
+            color: Colors.white,
+            margin: EdgeInsets.symmetric(horizontal: 12.0),
+            padding: EdgeInsets.only(top: 38.0),
+            alignment: Alignment.centerLeft,
+            child: Row(
+              children: <Widget>[
+                InkWell(
+                  child: Container(
+                    padding: EdgeInsets.all(12.0),
+                    child: Image.asset(
+                      menu,
+                      height: 14,
+                      width: 18.0,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  onTap: () {
+                    _globalKey.currentState.openDrawer();
+                  },
+                ),
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.center,
+                    height: 35.0,
+                    child: config.value == null
+                        ? Image.asset(
+                            logo,
+                          )
+                        : CachedNetworkImage(
+                            imageUrl: config.value?.getString(app_logo ?? ""),
+                          ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
-        SizedBox(
-          height: 20.0,
+        body: new Column(
+          children: <Widget>[
+            SizedBox(
+              height: 20.0,
+            ),
+            new Flexible(
+                child: new ListView.builder(
+              padding: new EdgeInsets.all(8.0),
+              reverse: true,
+              itemBuilder: (_, int index) => _messages[index],
+              itemCount: _messages.length,
+            )),
+            new Divider(height: 1.0),
+            new Container(
+              decoration: new BoxDecoration(color: Theme.of(context).cardColor),
+              child: _buildTextComposer(),
+            ),
+          ],
         ),
-        new Flexible(
-            child: new ListView.builder(
-          padding: new EdgeInsets.all(8.0),
-          reverse: true,
-          itemBuilder: (_, int index) => _messages[index],
-          itemCount: _messages.length,
-        )),
-        new Divider(height: 1.0),
-        new Container(
-          decoration: new BoxDecoration(color: Theme.of(context).cardColor),
-          child: _buildTextComposer(),
-        ),
-      ]),
+        drawer: Menu(),
+      ),
     );
   }
 }

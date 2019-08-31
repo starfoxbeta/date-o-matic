@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:datematic/images.dart';
 import 'package:datematic/routes.dart';
 import 'package:datematic/screens/board/notification_page.dart';
 import 'package:datematic/screens/dialog_flow_page.dart';
@@ -50,21 +51,39 @@ class _HomePageState extends State<HomePage> {
     var user = Provider.of<FirebaseUser>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.0,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.navigate_next,
-              color: Colors.blue,
-              size: 40.0,
-            ),
-            onPressed: () {
-              push(context: context, page: HomePageDialogflow());
-            },
+      appBar: PreferredSize(
+        preferredSize: Size(MediaQuery.of(context).size.width, 90),
+        child: Container(
+          color: Colors.white,
+          margin: EdgeInsets.symmetric(horizontal: 20.0),
+          alignment: Alignment.centerLeft,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              InkWell(
+                child: Container(
+                  child: Image.asset(
+                    menu,
+                    height: 14,
+                    width: 18.0,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                onTap: () {},
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.navigate_next,
+                  color: Colors.blue,
+                  size: 40.0,
+                ),
+                onPressed: () {
+                  push(context: context, page: HomePageDialogflow());
+                },
+              ),
+            ],
           ),
-        ],
+        ),
       ),
       body: Container(
         margin: EdgeInsets.all(16.0),

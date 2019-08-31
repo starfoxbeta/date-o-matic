@@ -28,14 +28,13 @@
 .pub-cache/
 .pub/
 /build/
-/assets/credentials.json
+
 # Android related
 **/android/**/gradle-wrapper.jar
 **/android/.gradle
 **/android/captures/
 **/android/gradlew
 **/android/gradlew.bat
-**/android/app/google-services.json
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
 

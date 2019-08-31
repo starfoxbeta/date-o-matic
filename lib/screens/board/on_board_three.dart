@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:datematic/colors.dart';
 import 'package:datematic/routes.dart';
-import 'package:datematic/screens/sign_up.dart';
+import 'package:datematic/screens/board/phone.dart';
 import 'package:datematic/tools/app_provider.dart';
 import 'package:datematic/tools/remote_configuration.dart';
 import 'package:flutter/material.dart';
@@ -62,7 +62,7 @@ class ThirdOnBoardPage extends StatelessWidget {
               ),
             ),
           ),
-          onTap: () => push(context: context, page: SignUpPage()),
+          onTap: () => push(context: context, page: PhonePage()),
         ),
         SizedBox(
           height: 50.0,

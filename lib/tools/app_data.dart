@@ -14,6 +14,7 @@ const String amountValidation = r"^[0-9]{1,4}(\.[0-9]{1,8})?$";
 const String successful = "Successful";
 const String error = "Error";
 const String disagree = "Disagree";
+const String poor = "poor";
 
 //connectivity
 const String connection = "connection";

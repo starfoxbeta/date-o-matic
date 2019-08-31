@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:datematic/screens/dialog_flow_page.dart';
+import 'package:datematic/screens/quiz/question.dart';
 import 'package:datematic/tools/api_service.dart';
 import 'package:datematic/tools/app_provider.dart';
 import 'package:datematic/tools/remote_configuration.dart';
@@ -315,7 +316,7 @@ class _SignUpPageState extends State<SignUpPage> {
     );
     if (response == successful) {
       closeProgressDialog(context);
-      pushReplacement(context: context, page: HomePageDialogflow());
+      pushReplacement(context: context, page: QuestionPage());
       print("success");
     } else if (response == error) {
       closeProgressDialog(context);

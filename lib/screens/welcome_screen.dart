@@ -6,6 +6,8 @@ import 'package:datematic/screens/board/board.dart';
 import 'package:datematic/screens/login_page.dart';
 import 'package:datematic/tools/app_provider.dart';
 import 'package:datematic/tools/remote_configuration.dart';
+import 'package:datematic/widgets/widget_button.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -77,16 +79,10 @@ class WelcomePage extends StatelessWidget {
                       SizedBox(
                         width: 3.0,
                       ),
-                      Container(
+                      Image.asset(
+                        energy,
+                        width: 18.0,
                         height: 18.0,
-                        child: config.value == null
-                            ? Image.asset(
-                                energy,
-                              )
-                            : CachedNetworkImage(
-                                imageUrl:
-                                    config.value?.getString(img_energy ?? ""),
-                              ),
                       ),
                     ],
                   )
@@ -95,28 +91,11 @@ class WelcomePage extends StatelessWidget {
           SizedBox(
             height: 30.0,
           ),
-          GestureDetector(
-            child: Container(
-              height: 50.0,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: Color(0xFF2E5BFF),
-                  borderRadius: BorderRadius.circular(4.0)),
-              margin: EdgeInsets.symmetric(horizontal: 29.0),
-              child: Text(
-                config.value == null
-                    ? def_btn_welcome
-                    : config.value?.getString(btn_welcome) ?? def_btn_welcome,
-                style: TextStyle(
-                  fontSize: 18.0,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            onTap: () {
-              push(context: context, page: BoardPage());
-            },
+          Button(
+            onTap: () => push(context: context, page: BoardPage()),
+            text: config.value == null
+                ? def_btn_welcome
+                : config.value?.getString(btn_welcome) ?? def_btn_welcome,
           ),
           SizedBox(
             height: 30.0,
@@ -155,7 +134,10 @@ class WelcomePage extends StatelessWidget {
                     color: Color(0xFF2E5BFF),
                   ),
                 ),
-                onTap: () => push(context: context, page: LoginPage()),
+                onTap: () {
+                  _createDynamicLink(false);
+                  push(context: context, page: LoginPage());
+                },
               ),
             ],
           ),
@@ -165,5 +147,28 @@ class WelcomePage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _createDynamicLink(bool short) async {
+    final DynamicLinkParameters parameters = DynamicLinkParameters(
+      uriPrefix: 'https://datematic.page.link',
+      link: Uri.parse(''),
+      androidParameters: AndroidParameters(
+        packageName: 'com.example.datematic',
+        minimumVersion: 16,
+      ),
+      dynamicLinkParametersOptions: DynamicLinkParametersOptions(
+        shortDynamicLinkPathLength: ShortDynamicLinkPathLength.short,
+      ),
+    );
+
+    Uri url;
+    if (short) {
+      final ShortDynamicLink shortLink = await parameters.buildShortLink();
+      url = shortLink.shortUrl;
+    } else {
+      url = await parameters.buildUrl();
+    }
+    print(url.toString());
   }
 }

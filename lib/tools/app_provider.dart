@@ -13,6 +13,17 @@ class AppProvider with ChangeNotifier {
   set setRemote(RemoteConfig config) {
     _value = config;
   }
+
+
+}
+
+class MenuProvider with ChangeNotifier{
+  int _selectedIndex = 0; //This is to know the selected item in the drawer
+  int get selectedItem =>
+      _selectedIndex; //This gets the selected index in the drawer
+  set setIndex(int index) {
+    _selectedIndex = index;
+  }
 }
 
 class ConnectivityService {

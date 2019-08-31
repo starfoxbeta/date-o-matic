@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "658003858902",
+    "firebase_url": "https://domapp-f603e.firebaseio.com",
+    "project_id": "domapp-f603e",
+    "storage_bucket": "domapp-f603e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:658003858902:android:00773dcef23d9185",
+        "android_client_info": {
+          "package_name": "com.example.datematic"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "658003858902-f5flaiclhehq5k0obji0j3306vaflcos.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.datematic",
+            "certificate_hash": "ea49e510fb86d8a06c93657cb907451bbfdaa374"
+          }
+        },
+        {
+          "client_id": "658003858902-9up0lr3h6gkif307mvpifnkf8mrbocem.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvo3rhsxtp-AldKgvAEOtYAn0nnFtK8Kg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "658003858902-9up0lr3h6gkif307mvpifnkf8mrbocem.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
