@@ -44,7 +44,7 @@ class _HomePageDialogflow extends State<HomePageDialogflow> {
     );
   }
 
-  void Response(query) async {
+  void response(query) async {
     _textController.clear();
     AuthGoogle authGoogle =
         await AuthGoogle(fileJson: "assets/credentials.json").build();
@@ -72,7 +72,7 @@ class _HomePageDialogflow extends State<HomePageDialogflow> {
     setState(() {
       _messages.insert(0, message);
     });
-    Response(text);
+    response(text);
   }
 
   @override

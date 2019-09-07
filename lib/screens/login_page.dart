@@ -4,7 +4,6 @@ import 'package:datematic/images.dart';
 import 'package:datematic/routes.dart';
 import 'package:datematic/screens/home_page.dart';
 import 'package:datematic/screens/sign_up.dart';
-import 'package:datematic/screens/welcome_screen.dart';
 import 'package:datematic/tools/api_service.dart';
 import 'package:datematic/tools/app_data.dart';
 import 'package:datematic/tools/app_provider.dart';

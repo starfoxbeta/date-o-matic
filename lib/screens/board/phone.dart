@@ -34,7 +34,7 @@ class _PhonePageState extends State<PhonePage> {
   bool phoneVerified = false;
 
   void onPhoneNumberChanged(String phoneNumber) {
-    print(phoneNumber);
+    print(this.phoneNumber);
     setState(() {
       this.phoneNumber = phoneNumber;
     });
@@ -83,7 +83,6 @@ class _PhonePageState extends State<PhonePage> {
                       shouldParse: true,
                       inputDecoration: InputDecoration(
                         border: OutlineInputBorder(),
-                        errorText: valid ? null : "Wrong mobile number",
                       ),
                     ),
                     SizedBox(

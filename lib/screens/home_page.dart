@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:datematic/images.dart';
 import 'package:datematic/routes.dart';
 import 'package:datematic/screens/board/notification_page.dart';
-import 'package:datematic/screens/dialog_flow_page.dart';
+import 'package:datematic/screens/menu.dart';
+import 'package:datematic/tools/DatematicAppBar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +16,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  GlobalKey<ScaffoldState> _globalKey = GlobalKey();
   String content;
 
   @override
@@ -49,41 +50,11 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     var user = Provider.of<FirebaseUser>(context);
-
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size(MediaQuery.of(context).size.width, 90),
-        child: Container(
-          color: Colors.white,
-          margin: EdgeInsets.symmetric(horizontal: 20.0),
-          alignment: Alignment.centerLeft,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              InkWell(
-                child: Container(
-                  child: Image.asset(
-                    menu,
-                    height: 14,
-                    width: 18.0,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-                onTap: () {},
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.navigate_next,
-                  color: Colors.blue,
-                  size: 40.0,
-                ),
-                onPressed: () {
-                  push(context: context, page: HomePageDialogflow());
-                },
-              ),
-            ],
-          ),
-        ),
+      key: _globalKey,
+      appBar: DatematicAppBar(
+        globalKey: _globalKey,
+        context: context,
       ),
       body: Container(
         margin: EdgeInsets.all(16.0),
@@ -120,6 +91,7 @@ class _HomePageState extends State<HomePage> {
           },
         ),
       ),
+      drawer: Menu(),
     );
   }
 

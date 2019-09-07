@@ -23,3 +23,6 @@ const String connection = "connection";
 FirebaseAuth auth = FirebaseAuth.instance;
 Firestore db = Firestore.instance;
 FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+
+// Referrer details
+const String referrerId = "referrerID";

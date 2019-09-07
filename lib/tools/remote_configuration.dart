@@ -5,7 +5,6 @@ class Config {
     final RemoteConfig remoteConfig = await RemoteConfig.instance;
     remoteConfig.setConfigSettings(RemoteConfigSettings(debugMode: false));
     remoteConfig.setDefaults(<String, dynamic>{});
-    await remoteConfig.notifyListeners();
     await remoteConfig.fetch(expiration: const Duration(seconds: 0));
     await remoteConfig.activateFetched();
     return remoteConfig;

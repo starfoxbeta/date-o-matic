@@ -5,6 +5,7 @@ import 'package:datematic/screens/dialog_flow_page.dart';
 import 'package:datematic/screens/welcome_screen.dart';
 import 'package:datematic/tools/api_service.dart';
 import 'package:datematic/tools/app_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -136,6 +137,7 @@ class Item extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     MenuProvider provider = Provider.of<MenuProvider>(context);
+    var user = Provider.of<FirebaseUser>(context);
     return Container(
       decoration: BoxDecoration(
         color: provider.selectedItem == index
@@ -168,6 +170,12 @@ class Item extends StatelessWidget {
             provider.setIndex = 0;
             await ApiService.handleSignOut();
             pushAndRemove(context: context, page: WelcomePage());
+            return;
+          }
+          if (index == 1) {
+            provider.setIndex = 1;
+            ApiService().createDynamicLink(short: true, referrerId: user.uid);
+            Navigator.pop(context);
             return;
           }
           provider.setIndex = index;

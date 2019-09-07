@@ -1,7 +1,8 @@
 import 'package:datematic/screens/home_page.dart';
-import 'package:datematic/screens/quiz/question.dart';
 import 'package:datematic/screens/welcome_screen.dart';
+import 'package:datematic/tools/app_data.dart';
 import 'package:datematic/tools/app_provider.dart';
+import 'package:datematic/tools/app_tools.dart';
 import 'package:datematic/tools/remote_configuration.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -68,7 +69,7 @@ class _NavigationPageState extends State<NavigationPage> {
       stream: value?.setupRemoteConfig()?.asStream(),
       builder: (context, snapshot) {
         config.setRemote = snapshot?.data;
-        return user == null ? QuestionPage() : HomePage();
+        return user == null ? WelcomePage() : HomePage();
       },
     );
   }
@@ -78,14 +79,17 @@ class _NavigationPageState extends State<NavigationPage> {
         await FirebaseDynamicLinks.instance.getInitialLink();
     final Uri deepLink = data?.link;
     if (deepLink != null) {
-      print("hello");
+      String path = deepLink.path.toString().substring(1);
+      writeStringDataLocally(key: referrerId, value: path);
+       print(await getStringDataLocally(key: referrerId));
     }
-
     FirebaseDynamicLinks.instance.onLink(
         onSuccess: (PendingDynamicLinkData dynamicLink) async {
       final Uri deepLink = dynamicLink?.link;
       if (deepLink != null) {
-        print(deepLink.path);
+        String path = deepLink.path.toString().substring(1);
+        writeStringDataLocally(key: referrerId, value: path);
+         print(await getStringDataLocally(key: referrerId));
       }
     }, onError: (OnLinkErrorException e) async {
       print('onLinkError');

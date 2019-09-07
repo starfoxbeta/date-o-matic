@@ -3,11 +3,10 @@ import 'package:datematic/colors.dart';
 import 'package:datematic/images.dart';
 import 'package:datematic/routes.dart';
 import 'package:datematic/screens/board/board.dart';
-import 'package:datematic/screens/login_page.dart';
+import 'package:datematic/tools/api_service.dart';
 import 'package:datematic/tools/app_provider.dart';
 import 'package:datematic/tools/remote_configuration.dart';
 import 'package:datematic/widgets/widget_button.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -135,8 +134,8 @@ class WelcomePage extends StatelessWidget {
                   ),
                 ),
                 onTap: () {
-                  _createDynamicLink(false);
-                  push(context: context, page: LoginPage());
+                  ApiService().createDynamicLink(short: true, referrerId: "7356647hdtstyffsy");
+                  //push(context: context, page: LoginPage());
                 },
               ),
             ],
@@ -149,26 +148,5 @@ class WelcomePage extends StatelessWidget {
     );
   }
 
-  Future<void> _createDynamicLink(bool short) async {
-    final DynamicLinkParameters parameters = DynamicLinkParameters(
-      uriPrefix: 'https://datematic.page.link',
-      link: Uri.parse(''),
-      androidParameters: AndroidParameters(
-        packageName: 'com.example.datematic',
-        minimumVersion: 16,
-      ),
-      dynamicLinkParametersOptions: DynamicLinkParametersOptions(
-        shortDynamicLinkPathLength: ShortDynamicLinkPathLength.short,
-      ),
-    );
-
-    Uri url;
-    if (short) {
-      final ShortDynamicLink shortLink = await parameters.buildShortLink();
-      url = shortLink.shortUrl;
-    } else {
-      url = await parameters.buildUrl();
-    }
-    print(url.toString());
-  }
+  
 }

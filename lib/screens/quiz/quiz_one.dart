@@ -1,9 +1,7 @@
 import 'package:datematic/colors.dart';
 import 'package:datematic/images.dart';
-import 'package:datematic/tools/app_provider.dart';
 import 'package:datematic/widgets/widget_button.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class QuizOne extends StatefulWidget {
   final PageController controller;
@@ -17,7 +15,6 @@ class _QuizOneState extends State<QuizOne> {
   String currentValue = "";
   @override
   Widget build(BuildContext context) {
-    var config = Provider.of<AppProvider>(context);
     return Column(
       children: <Widget>[
         Container(

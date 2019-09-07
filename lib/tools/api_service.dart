@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'package:datematic/tools/app_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:data_connection_checker/data_connection_checker.dart';
+import 'package:package_info/package_info.dart';
+import 'package:share/share.dart';
 
 class ApiService {
   // This is for the google sign in
@@ -25,6 +28,7 @@ class ApiService {
       FirebaseUser firebaseUser = (await auth.signInWithEmailAndPassword(
               email: email, password: password))
           .user;
+      print(firebaseUser.email);
       return successful;
     } on PlatformException catch (e) {
       print(e.message);
@@ -87,6 +91,7 @@ class ApiService {
   static Future<String> sendToApi(FirebaseUser user) async {
     try {
       String token = await firebaseMessaging.getToken();
+      //String referrer = await getStringDataLocally(key: referrerId);
       if (user != null && token != null) {
         http.Response response = await http.post(
           _url,
@@ -105,5 +110,36 @@ class ApiService {
     } catch (e) {
       return e.toString();
     }
+  }
+
+// This gets each user dynamic link
+  Future<void> createDynamicLink({bool short, String referrerId}) async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    final DynamicLinkParameters parameters = DynamicLinkParameters(
+      uriPrefix: 'https://datematic.page.link',
+      link: Uri.parse(
+          'https://dynamic.link.example/$referrerId'),
+      androidParameters: AndroidParameters(
+        packageName: packageInfo.packageName,
+        minimumVersion: 21,
+      ),
+      iosParameters: IosParameters(
+      bundleId: packageInfo.packageName,
+      minimumVersion: '1.0.1',
+      appStoreId: '',
+  ),
+      dynamicLinkParametersOptions: DynamicLinkParametersOptions(
+        shortDynamicLinkPathLength: ShortDynamicLinkPathLength.short,
+      ),
+    );
+    Uri url;
+    if (short) {
+      final ShortDynamicLink shortLink = await parameters.buildShortLink();
+      url = shortLink.shortUrl;
+    } else {
+      url = await parameters.buildUrl();
+    }
+    String message = "Use my referral link to join Datematic through me";
+    Share.share("$message. \nFollow this link\n\n$url\n\n Open with Chrome or default browser");
   }
 }
