@@ -2,7 +2,111 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:datematic/tools/progress_dialog.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+showNotification({String name}) {
+  showOverlayNotification((context) {
+    return SlideDismissible(
+        enable: true,
+        key: Key("notify"),
+        child: Material(
+          color: Color.fromRGBO(89, 205, 255, 0.77),
+          elevation: 16.0,
+          child: Container(
+            height: 100.0,
+            alignment: Alignment.center,
+            child: SafeArea(
+              bottom: false,
+              child: ListTileTheme(
+                textColor: Theme.of(context)?.accentTextTheme?.title?.color,
+                iconColor: Theme.of(context)?.accentTextTheme?.title?.color,
+                child: ListTile(
+                  title: RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "WELCOME! ",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18.0,
+                          ),
+                        ),
+                        TextSpan(
+                          text: name.toUpperCase(),
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ));
+  }, duration: Duration(seconds: 5));
+}
+
+comingSoonNotification() {
+  showOverlayNotification((context) {
+    return SlideDismissible(
+        enable: true,
+        key: Key("notify"),
+        child: Material(
+          color: Color.fromRGBO(89, 255, 170, 0.77),
+          elevation: 16.0,
+          child: Container(
+            height: 150.0,
+            alignment: Alignment.center,
+            child: SafeArea(
+              bottom: false,
+              child: ListTileTheme(
+                textColor: Theme.of(context)?.accentTextTheme?.title?.color,
+                iconColor: Theme.of(context)?.accentTextTheme?.title?.color,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      "COMING SOON",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18.0,
+                      ),
+                    ),
+                    SizedBox(height: 5.0),
+                    Text(
+                      "Sorry, we haven't activated this feature yet!",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16.0,
+                      ),
+                    ),
+                    SizedBox(height: 16.0),
+                    InkWell(
+                      child: Text("Get Help",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF2E5BFF),
+                          )),
+                      onTap: () {},
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ));
+  }, duration: Duration(seconds: 3));
+}
 
 showSnackBar({String message, GlobalKey<ScaffoldState> key, Color color}) {
   key.currentState.showSnackBar(

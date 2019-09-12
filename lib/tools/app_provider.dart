@@ -7,22 +7,81 @@ import 'package:flutter/material.dart';
 
 enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
 
+class QuizProvider {
+  Map<String, dynamic> _q1;
+  Map<String, dynamic> get q1 => _q1;
+  set setQuiz1(Map value) {
+    _q1 = value;
+  }
+
+  Map<String, dynamic> _q2;
+  Map<String, dynamic> get q2 => _q2;
+  set setQuiz2(Map value) {
+    _q2 = value;
+  }
+
+  Map<String, dynamic> _q3;
+  Map<String, dynamic> get q3 => _q3;
+  set setQuiz3(Map value) {
+    _q3 = value;
+  }
+
+  Map<String, dynamic> _q4;
+  Map<String, dynamic> get q4 => _q4;
+  set setQuiz4(Map value) {
+    _q4 = value;
+  }
+
+  Map<String, dynamic> _q5;
+  Map<String, dynamic> get q5 => _q5;
+  set setQuiz5(Map value) {
+    _q5 = value;
+  }
+
+  Map<String, dynamic> _q6;
+  Map<String, dynamic> get q6 => _q6;
+  set setQuiz6(Map value) {
+    _q6 = value;
+  }
+}
+
+//--------------------------------------------------
 class AppProvider with ChangeNotifier {
   RemoteConfig _value;
   RemoteConfig get value => _value;
   set setRemote(RemoteConfig config) {
     _value = config;
   }
-
-
 }
 
-class MenuProvider with ChangeNotifier{
+class LoadProvider with ChangeNotifier {
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+  set setLoadingStatus(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+}
+
+class MenuProvider with ChangeNotifier {
   int _selectedIndex = 0; //This is to know the selected item in the drawer
   int get selectedItem =>
       _selectedIndex; //This gets the selected index in the drawer
   set setIndex(int index) {
     _selectedIndex = index;
+  }
+}
+
+class StylesSelectionProvider with ChangeNotifier {
+  List<String> _list = [];
+  List<String> get getList => _list;
+  set addList(String name) {
+    if (_list.contains(name)) {
+      _list.remove(name);
+    } else {
+      _list.add(name);
+    }
+    notifyListeners();
   }
 }
 

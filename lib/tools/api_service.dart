@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:datematic/tools/app_data.dart';
+import 'package:datematic/tools/app_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:package_info/package_info.dart';
+import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 
 class ApiService {
@@ -86,7 +88,6 @@ class ApiService {
     await auth.signOut();
   }
 
- 
 // this method is called in order to send user details to the API
   static Future<String> sendToApi(FirebaseUser user) async {
     try {
@@ -117,17 +118,16 @@ class ApiService {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     final DynamicLinkParameters parameters = DynamicLinkParameters(
       uriPrefix: 'https://datematic.page.link',
-      link: Uri.parse(
-          'https://dynamic.link.example/$referrerId'),
+      link: Uri.parse('https://dynamic.link.example/$referrerId'),
       androidParameters: AndroidParameters(
         packageName: packageInfo.packageName,
         minimumVersion: 21,
       ),
       iosParameters: IosParameters(
-      bundleId: packageInfo.packageName,
-      minimumVersion: '1.0.1',
-      appStoreId: '',
-  ),
+        bundleId: packageInfo.packageName,
+        minimumVersion: '1.0.1',
+        appStoreId: '',
+      ),
       dynamicLinkParametersOptions: DynamicLinkParametersOptions(
         shortDynamicLinkPathLength: ShortDynamicLinkPathLength.short,
       ),
@@ -140,6 +140,30 @@ class ApiService {
       url = await parameters.buildUrl();
     }
     String message = "Use my referral link to join Datematic through me";
-    Share.share("$message. \nFollow this link\n\n$url\n\n Open with Chrome or default browser");
+    Share.share(
+        "$message. \nFollow this link\n\n$url\n\n Open with Chrome or default browser");
+  }
+
+  static Future<String> submitQuiz(BuildContext context) async {
+    QuizProvider quizProvider = Provider.of<QuizProvider>(context);
+    FirebaseUser user = await auth.currentUser();
+    if (user != null) {
+      try {
+        await db.collection(quizCollection).document(user.uid).setData({
+          quiz1: quizProvider.q1,
+          quiz2: quizProvider.q2,
+          quiz3: quizProvider.q3,
+          quiz4: quizProvider.q4,
+          quiz5: quizProvider.q5,
+          quiz6: quizProvider.q6,
+          "uid": user.uid,
+        });
+        return successful;
+      } on PlatformException catch (e) {
+        return error;
+      }
+    } else {
+      return error;
+    }
   }
 }

@@ -41,6 +41,9 @@ dependencies:
   firebase_dynamic_links: ^0.5.0+1
   share: ^0.6.2+1
   package_info: ^0.4.0+6
+  overlay_support: ^1.0.1
+  firebase_analytics: ^5.0.2
+  intl: ^0.16.0
 
 flutter_icons:
   android: "launcher_icon"

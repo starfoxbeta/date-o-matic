@@ -10,6 +10,9 @@ const String userNameValidation = r'^[A-Za-z0-9_]+$';
 const String bitCoinValidation = r"^[13][a-km-zA-HJ-NP-Z1-9]{26,33}$";
 const String amountValidation = r"^[0-9]{1,4}(\.[0-9]{1,8})?$";
 
+//Firestore data
+String quizCollection = "quiz";
+
 // App Data
 const String successful = "Successful";
 const String error = "Error";
@@ -26,3 +29,17 @@ FirebaseMessaging firebaseMessaging = FirebaseMessaging();
 
 // Referrer details
 const String referrerId = "referrerID";
+
+// quiz data
+String quiz1 = "quiz1";
+String quiz2 = "quiz2";
+String quiz3 = "quiz3";
+String quiz4 = "quiz4";
+String quiz5 = "quiz5";
+String quiz6 = "quiz6";
+String question = "question";
+String answer = "answer";
+
+String zipcode = "zipcode";
+String citystate = "citystate";
+String planet = "planet";

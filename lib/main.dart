@@ -1,4 +1,6 @@
+import 'package:datematic/screens/confirm_page.dart';
 import 'package:datematic/screens/home_page.dart';
+import 'package:datematic/screens/quiz/question.dart';
 import 'package:datematic/screens/welcome_screen.dart';
 import 'package:datematic/tools/app_data.dart';
 import 'package:datematic/tools/app_provider.dart';
@@ -7,6 +9,8 @@ import 'package:datematic/tools/remote_configuration.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
 
 void main() => runApp(MyApp());
@@ -30,19 +34,30 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<AppProvider>.value(
           value: AppProvider(),
         ),
+        ChangeNotifierProvider<StylesSelectionProvider>.value(
+          value: StylesSelectionProvider(),
+        ),
+        Provider<QuizProvider>.value(
+          value: QuizProvider(),
+        ),
         ChangeNotifierProvider<MenuProvider>.value(
           value: MenuProvider(),
-        )
-      ],
-      child: MaterialApp(
-        title: 'Datematic',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          scaffoldBackgroundColor: Colors.white,
-          fontFamily: "Rubik",
         ),
-        home: NavigationPage(),
+        ChangeNotifierProvider<LoadProvider>.value(
+          value: LoadProvider(),
+        ),
+      ],
+      child: OverlaySupport(
+        child: MaterialApp(
+          title: 'Datematic',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+            scaffoldBackgroundColor: Colors.white,
+            fontFamily: "Rubik",
+          ),
+          home: NavigationPage(),
+        ),
       ),
     );
   }
@@ -57,6 +72,8 @@ class _NavigationPageState extends State<NavigationPage> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     _retrieveDynamicLink();
   }
 
@@ -69,11 +86,13 @@ class _NavigationPageState extends State<NavigationPage> {
       stream: value?.setupRemoteConfig()?.asStream(),
       builder: (context, snapshot) {
         config.setRemote = snapshot?.data;
-        return user == null ? WelcomePage() : HomePage();
+
+        return user == null ? WelcomePage() : QuestionPage();
       },
     );
   }
 
+// This function is called to retrieve dynamic link
   Future<void> _retrieveDynamicLink() async {
     final PendingDynamicLinkData data =
         await FirebaseDynamicLinks.instance.getInitialLink();
@@ -81,19 +100,59 @@ class _NavigationPageState extends State<NavigationPage> {
     if (deepLink != null) {
       String path = deepLink.path.toString().substring(1);
       writeStringDataLocally(key: referrerId, value: path);
-       print(await getStringDataLocally(key: referrerId));
+      print(await getStringDataLocally(key: referrerId));
     }
     FirebaseDynamicLinks.instance.onLink(
-        onSuccess: (PendingDynamicLinkData dynamicLink) async {
-      final Uri deepLink = dynamicLink?.link;
-      if (deepLink != null) {
-        String path = deepLink.path.toString().substring(1);
-        writeStringDataLocally(key: referrerId, value: path);
-         print(await getStringDataLocally(key: referrerId));
+      onSuccess: (PendingDynamicLinkData dynamicLink) async {
+        final Uri deepLink = dynamicLink?.link;
+        if (deepLink != null) {
+          String path = deepLink.path.toString().substring(1);
+          writeStringDataLocally(key: referrerId, value: path);
+          print(await getStringDataLocally(key: referrerId));
+        }
+      },
+      onError: (OnLinkErrorException e) async {
+        print('onLinkError');
+        print(e.message);
+      },
+    );
+  }
+
+  Future<Widget> getNextWidget(FirebaseUser user) async {
+    bool isQuizFinished = false;
+    bool isContentReady = false;
+    await db
+        .collection(quizCollection)
+        .where("uid", isEqualTo: user.uid)
+        .getDocuments()
+        .then((snapshot) {
+      if (snapshot.documents.length > 0) {
+        isQuizFinished = true;
+      } else {
+        isQuizFinished = false;
       }
-    }, onError: (OnLinkErrorException e) async {
-      print('onLinkError');
-      print(e.message);
+    }).catchError((e) {
+      isQuizFinished = false;
     });
+
+    await db.collection("contents").document(user.uid).get().then((snapshot) {
+      if (snapshot.data["content"].toString().isNotEmpty) {
+        isContentReady = true;
+      } else {
+        isContentReady = false;
+      }
+    }).catchError((e) {
+      isContentReady = false;
+    });
+    if (isQuizFinished == false) {
+      return QuestionPage();
+    }
+    if (isQuizFinished == true && isContentReady == false) {
+      return ConfirmationPage();
+    }
+    if (isQuizFinished == true && isContentReady == true) {
+      return HomePage();
+    }
+    return QuestionPage();
   }
 }

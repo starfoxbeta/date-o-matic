@@ -1,12 +1,11 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:datematic/screens/quiz/question.dart';
 import 'package:datematic/tools/api_service.dart';
 import 'package:datematic/tools/app_provider.dart';
+import 'package:datematic/tools/colors.dart';
+import 'package:datematic/tools/images.dart';
 import 'package:datematic/tools/remote_configuration.dart';
+import 'package:datematic/tools/routes.dart';
 import 'package:flutter/material.dart';
-import 'package:datematic/colors.dart';
-import 'package:datematic/images.dart';
-import 'package:datematic/routes.dart';
 import 'package:datematic/screens/login_page.dart';
 import 'package:datematic/tools/app_data.dart';
 import 'package:datematic/tools/app_tools.dart';
@@ -42,15 +41,17 @@ class _SignUpPageState extends State<SignUpPage> {
               height: 60.0,
             ),
             Container(
-              height: 35.0,
-              child: config.value == null
+                height: 35.0,
+                child: Image.asset(
+                  logo,
+                ) /*  config.value == null
                   ? Image.asset(
                       logo,
                     )
                   : CachedNetworkImage(
                       imageUrl: config.value?.getString(app_logo ?? ""),
-                    ),
-            ),
+                    ), */
+                ),
             SizedBox(
               height: 30.0,
             ),
@@ -108,16 +109,18 @@ class _SignUpPageState extends State<SignUpPage> {
                                 radius: 24.0,
                                 child: Center(
                                   child: Container(
-                                    height: 24.0,
-                                    child: config.value == null
+                                      height: 24.0,
+                                      child: Image.asset(
+                                        energy,
+                                      ) /* config.value == null
                                         ? Image.asset(
                                             energy,
                                           )
                                         : CachedNetworkImage(
                                             imageUrl: config.value
                                                 ?.getString(img_energy ?? ""),
-                                          ),
-                                  ),
+                                          ), */
+                                      ),
                                 ),
                                 backgroundColor:
                                     Color(0xFF2E5BFF).withOpacity(0.2),
@@ -197,7 +200,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     style: TextStyle(fontSize: 18.0),
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
-                      hintText: "EMAIL ADDRESS",
+                      hintText: "ENTER YOUR EMAIL",
                       hintStyle: TextStyle(fontSize: 18.0),
                       border: OutlineInputBorder(),
                       fillColor: Color.fromRGBO(224, 231, 255, 0.2),
@@ -217,7 +220,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     textInputAction: TextInputAction.done,
                     obscureText: true,
                     decoration: InputDecoration(
-                      hintText: "PASSWORD",
+                      hintText: "CHOOSE PASSWORD",
                       hintStyle: TextStyle(fontSize: 18.0),
                       border: OutlineInputBorder(),
                       fillColor: Color.fromRGBO(224, 231, 255, 0.2),

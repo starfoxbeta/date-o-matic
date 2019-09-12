@@ -1,9 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:datematic/colors.dart';
 import 'package:datematic/tools/app_provider.dart';
+import 'package:datematic/tools/colors.dart';
+import 'package:datematic/tools/images.dart';
 import 'package:datematic/tools/remote_configuration.dart';
 import 'package:flutter/material.dart';
-import 'package:datematic/images.dart';
 import 'package:provider/provider.dart';
 
 class SecondOnBoardPage extends StatelessWidget {
@@ -62,14 +61,16 @@ class SecondOnBoardPage extends StatelessWidget {
         ),
         Expanded(
           child: Center(
-            child: config.value == null
+              child: Image.asset(
+            book,
+          ) /* config.value == null
                 ? Image.asset(
                     book,
                   )
                 : CachedNetworkImage(
                     imageUrl: config.value?.getString(img_board2 ?? ""),
-                  ),
-          ),
+                  ), */
+              ),
         ),
         SizedBox(
           height: 50.0,

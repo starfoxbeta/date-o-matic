@@ -1,7 +1,10 @@
-import 'package:datematic/colors.dart';
-import 'package:datematic/images.dart';
+import 'package:datematic/tools/app_data.dart';
+import 'package:datematic/tools/app_provider.dart';
+import 'package:datematic/tools/colors.dart';
+import 'package:datematic/tools/images.dart';
 import 'package:datematic/widgets/widget_button.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class QuizFive extends StatefulWidget {
   final PageController controller;
@@ -11,114 +14,145 @@ class QuizFive extends StatefulWidget {
 }
 
 class _QuizFiveState extends State<QuizFive> {
-  RangeValues values = RangeValues(0, 250);
-  String currentValue = "";
+  String _quizQuestion = "Which styles best describe you?";
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Column(
-        children: <Widget>[
-          Container(
-            width: MediaQuery.of(context).size.width,
-            alignment: Alignment.topRight,
-            padding: EdgeInsets.only(right: 40.0),
-            child: CircleAvatar(
-              radius: 30.0,
-              backgroundColor: Color(0xFF33AC2E).withOpacity(0.2),
-              child: Image.asset(
-                location,
-                height: 25.0,
-                width: 25.0,
-                fit: BoxFit.contain,
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 35.0),
+        child: Column(
+          children: <Widget>[
+            Container(
+              width: MediaQuery.of(context).size.width,
+              alignment: Alignment.topRight,
+              child: CircleAvatar(
+                radius: 30.0,
+                backgroundColor: Color(0xFF33AC2E).withOpacity(0.2),
+                child: Image.asset(
+                  location,
+                  height: 25.0,
+                  width: 25.0,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
-          ),
-          SizedBox(
-            height: 20.0,
-          ),
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 30.0),
-            child: TextHeader(
-              text: "Which styles best describe you?",
+            SizedBox(
+              height: 20.0,
             ),
-          ),
-          SizedBox(
-            height: 10.0,
-          ),
-          Container(
-            alignment: Alignment.topRight,
-            margin: EdgeInsets.symmetric(horizontal: 30.0),
-            child: CommonText(
-              text: "(choose multiple)",
-              color: textColor,
+            Container(
+              child: TextHeader(
+                text: _quizQuestion,
+              ),
             ),
-          ),
-          SizedBox(
-            height: 30.0,
-          ),
-          Container(
-              height: list.length * (MediaQuery.of(context).size.width / 5.0),
-              margin: EdgeInsets.symmetric(horizontal: 30.0),
-              child: GridView.builder(
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: list.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10.0,
-                    mainAxisSpacing: 10.0),
-                itemBuilder: (context, index) {
-                  return itemContainer(list[index].image, list[index].text);
-                },
-              )),
-          SizedBox(
-            height: 30.0,
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Button(
-              text: "Next",
-              margin: EdgeInsets.symmetric(horizontal: 60.0),
-              onTap: () {
-                widget.controller.nextPage(
-                    duration: Duration(milliseconds: 400),
-                    curve: Curves.easeIn);
+            SizedBox(
+              height: 10.0,
+            ),
+            Container(
+              alignment: Alignment.topRight,
+              child: CommonText(
+                text: "(choose multiple)",
+                color: textColor,
+              ),
+            ),
+            SizedBox(
+              height: 30.0,
+            ),
+            Consumer<StylesSelectionProvider>(
+              builder: (context, styleProvider, child) {
+                return Container(
+                    height:
+                        list.length * (MediaQuery.of(context).size.width / 4.9),
+                    child: GridView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: list.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10.0,
+                          mainAxisSpacing: 10.0),
+                      itemBuilder: (context, index) {
+                        return itemContainer(
+                            list[index].image, list[index].text, styleProvider);
+                      },
+                    ));
               },
             ),
-          )
-        ],
+            SizedBox(
+              height: 30.0,
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Button(
+                text: "Next",
+                margin: EdgeInsets.symmetric(horizontal: 25.0),
+                onTap: _submit,
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
 
-  Widget itemContainer(String image, String text) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 10.0),
-      decoration: BoxDecoration(
+  Widget itemContainer(
+      String image, String text, StylesSelectionProvider styleProvider) {
+    return InkWell(
+      onLongPress: () {
+        styleProvider.addList = text;
+      },
+      onTap: () {
+        if (styleProvider.getList.length >= 1) {
+          styleProvider.addList = text;
+        }
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 10.0),
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5.0),
-          border: Border.all(color: textColor)),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          CircleAvatar(
-            radius: 30.0,
-            backgroundColor: Color(0xFFFF5DB4).withOpacity(0.1),
-            child: Image.asset(
-              image,
-              fit: BoxFit.contain,
+          color: Colors.transparent,
+          border: Border.all(
+            width: styleProvider.getList.contains(text) ? 2.0 : 1.0,
+            color: styleProvider.getList.contains(text)
+                ? Colors.purple
+                : textColor,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            CircleAvatar(
+              radius: 30.0,
+              backgroundColor: Color(0xFFFF5DB4).withOpacity(0.1),
+              child: Image.asset(
+                image,
+                fit: BoxFit.contain,
+              ),
             ),
-          ),
-          SizedBox(
-            height: 20.0,
-          ),
-          CommonText(
-            text: text,
-            color: textColor,
-          )
-        ],
+            SizedBox(
+              height: 20.0,
+            ),
+            CommonText(
+              text: text,
+              color: textColor,
+            )
+          ],
+        ),
       ),
     );
+  }
+
+  _submit() {
+    QuizProvider quizProvider = Provider.of<QuizProvider>(context);
+    StylesSelectionProvider style =
+        Provider.of<StylesSelectionProvider>(context);
+    Map<String, dynamic> myResult = {
+      question: _quizQuestion,
+      answer: style.getList
+    };
+    quizProvider.setQuiz5 = myResult;
+    widget.controller
+        .nextPage(duration: Duration(milliseconds: 400), curve: Curves.easeIn);
   }
 }
 

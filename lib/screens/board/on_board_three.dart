@@ -1,11 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:datematic/colors.dart';
-import 'package:datematic/routes.dart';
 import 'package:datematic/screens/board/phone.dart';
 import 'package:datematic/tools/app_provider.dart';
+import 'package:datematic/tools/colors.dart';
+import 'package:datematic/tools/images.dart';
 import 'package:datematic/tools/remote_configuration.dart';
+import 'package:datematic/tools/routes.dart';
 import 'package:flutter/material.dart';
-import 'package:datematic/images.dart';
 import 'package:provider/provider.dart';
 
 class ThirdOnBoardPage extends StatelessWidget {
@@ -34,14 +33,16 @@ class ThirdOnBoardPage extends StatelessWidget {
         ),
         Expanded(
             child: Center(
-          child: config.value == null
+                child: Image.asset(
+          romatic,
+        ) /* config.value == null
               ? Image.asset(
                   romatic,
                 )
               : CachedNetworkImage(
                   imageUrl: config.value?.getString(img_board3 ?? ""),
-                ),
-        )),
+                ), */
+                )),
         SizedBox(
           height: 10.0,
         ),

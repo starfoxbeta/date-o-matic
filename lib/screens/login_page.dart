@@ -1,14 +1,13 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:datematic/colors.dart';
-import 'package:datematic/images.dart';
-import 'package:datematic/routes.dart';
 import 'package:datematic/screens/home_page.dart';
 import 'package:datematic/screens/sign_up.dart';
 import 'package:datematic/tools/api_service.dart';
 import 'package:datematic/tools/app_data.dart';
 import 'package:datematic/tools/app_provider.dart';
 import 'package:datematic/tools/app_tools.dart';
+import 'package:datematic/tools/colors.dart';
+import 'package:datematic/tools/images.dart';
 import 'package:datematic/tools/remote_configuration.dart';
+import 'package:datematic/tools/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -36,15 +35,17 @@ class _LoginPageState extends State<LoginPage> {
               height: 80.0,
             ),
             Container(
-              height: 35.0,
-              child: config.value == null
+                height: 35.0,
+                child: Image.asset(
+                  logo,
+                ) /* config.value == null
                   ? Image.asset(
                       logo,
                     )
                   : CachedNetworkImage(
                       imageUrl: config.value?.getString(app_logo ?? ""),
-                    ),
-            ),
+                    ), */
+                ),
             SizedBox(
               height: 40.0,
             ),

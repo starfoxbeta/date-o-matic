@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:datematic/routes.dart';
 import 'package:datematic/screens/board/notification_page.dart';
 import 'package:datematic/screens/menu.dart';
-import 'package:datematic/tools/DatematicAppBar.dart';
+import 'package:datematic/tools/routes.dart';
+import 'package:datematic/widgets/DatematicAppBar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';

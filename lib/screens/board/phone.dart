@@ -1,8 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
-import 'package:datematic/colors.dart';
-import 'package:datematic/images.dart';
-import 'package:datematic/routes.dart';
 import 'package:datematic/screens/pin_creation_screen/pin_code_view.dart';
 import 'package:datematic/screens/quiz/question.dart';
 import 'package:datematic/screens/sign_up.dart';
@@ -10,7 +6,9 @@ import 'package:datematic/tools/api_service.dart';
 import 'package:datematic/tools/app_data.dart';
 import 'package:datematic/tools/app_provider.dart';
 import 'package:datematic/tools/app_tools.dart';
-import 'package:datematic/tools/remote_configuration.dart';
+import 'package:datematic/tools/colors.dart';
+import 'package:datematic/tools/images.dart';
+import 'package:datematic/tools/routes.dart';
 import 'package:datematic/widgets/widget_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -61,15 +59,17 @@ class _PhonePageState extends State<PhonePage> {
                 height: 80.0,
               ),
               Container(
-                height: 35.0,
-                child: config.value == null
+                  height: 35.0,
+                  child: Image.asset(
+                    logo,
+                  ) /* config.value == null
                     ? Image.asset(
                         logo,
                       )
                     : CachedNetworkImage(
                         imageUrl: config.value?.getString(app_logo ?? ""),
-                      ),
-              ),
+                      ), */
+                  ),
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 40.0),
                 child: Column(
@@ -141,15 +141,17 @@ class _PhonePageState extends State<PhonePage> {
                       height: 80.0,
                     ),
                     Container(
-                      height: 35.0,
-                      child: config.value == null
+                        height: 35.0,
+                        child: Image.asset(
+                          logo,
+                        ) /* config.value == null
                           ? Image.asset(
                               logo,
                             )
                           : CachedNetworkImage(
                               imageUrl: config.value?.getString(app_logo ?? ""),
-                            ),
-                    ),
+                            ), */
+                        ),
                     SizedBox(
                       height: 30.0,
                     ),
@@ -237,7 +239,9 @@ class _PhonePageState extends State<PhonePage> {
                               fontSize: 16.0,
                               color: Colors.white,
                             )),
-                        onPressed: () {},
+                        onPressed: () {
+                          comingSoonNotification();
+                        },
                       ),
                       SizedBox(
                         height: 10.0,
