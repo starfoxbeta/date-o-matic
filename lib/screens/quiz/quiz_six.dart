@@ -1,4 +1,5 @@
 import 'package:datematic/screens/share_partner.dart';
+import 'package:datematic/tools/analytic_function.dart';
 import 'package:datematic/tools/api_service.dart';
 import 'package:datematic/tools/app_data.dart';
 import 'package:datematic/tools/app_provider.dart';
@@ -7,11 +8,17 @@ import 'package:datematic/tools/colors.dart';
 import 'package:datematic/tools/images.dart';
 import 'package:datematic/tools/routes.dart';
 import 'package:datematic/widgets/widget_button.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class QuizSix extends StatefulWidget {
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+  QuizSix({this.analytics, this.observer});
   @override
   _QuizSixState createState() => _QuizSixState();
 }
@@ -31,6 +38,13 @@ class _QuizSixState extends State<QuizSix> {
   String make = "Make-out-Spots";
   String tourist = "Tourist Okay";
   TextEditingController otherController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsFunction.sendAnalytics(
+        analytics: widget.analytics, screenName: "QUIZ 6");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -181,7 +195,7 @@ class _QuizSixState extends State<QuizSix> {
               padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5.0),
-                color: Colors.grey.withOpacity(0.2),
+                color: Colors.green.withOpacity(0.1),
               ),
               child: TextField(
                 controller: otherController,
@@ -209,8 +223,16 @@ class _QuizSixState extends State<QuizSix> {
                           String result = await ApiService.submitQuiz(context);
                           if (result == successful) {
                             isLoading.setLoadingStatus = false;
+                            isQuizFinished = true;
+                            writeBoolDataLocally(
+                                key: "quizFinished", value: true);
+
                             pushAndRemove(
-                                context: context, page: SharePartnerPage());
+                                context: context,
+                                page: SharePartnerPage(
+                                    analytics: widget.analytics,
+                                    observer: widget.observer),
+                                pageName: sharePartnerPage);
                             return;
                           }
                           isLoading.setLoadingStatus = false;
@@ -228,17 +250,19 @@ class _QuizSixState extends State<QuizSix> {
   }
 
   _submit() {
-    QuizProvider quizProvider = Provider.of<QuizProvider>(context);
-    Map<String, dynamic> myResult = {
-      question: _quizQuestion,
-      answer: {
-        pet: petFriendly,
-        smoke: nonSmoking,
-        make: makeOutSpot,
-        tourist: touristOkay,
-        "Other": otherController.text,
-      },
-    };
-    quizProvider.setQuiz6 = myResult;
+    SystemChannels.textInput.invokeMethod('TextInput.hide').whenComplete(() {
+      QuizProvider quizProvider = Provider.of<QuizProvider>(context);
+      Map<String, dynamic> myResult = {
+        question: _quizQuestion,
+        answer: {
+          pet: petFriendly,
+          smoke: nonSmoking,
+          make: makeOutSpot,
+          tourist: touristOkay,
+          "Other": otherController.text,
+        },
+      };
+      quizProvider.setQuiz6 = myResult;
+    });
   }
 }

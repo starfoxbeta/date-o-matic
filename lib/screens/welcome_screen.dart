@@ -1,15 +1,34 @@
 import 'package:datematic/screens/board/board.dart';
 import 'package:datematic/screens/login_page.dart';
+import 'package:datematic/tools/analytic_function.dart';
+import 'package:datematic/tools/app_data.dart';
 import 'package:datematic/tools/app_provider.dart';
 import 'package:datematic/tools/colors.dart';
 import 'package:datematic/tools/images.dart';
 import 'package:datematic/tools/remote_configuration.dart';
 import 'package:datematic/tools/routes.dart';
 import 'package:datematic/widgets/widget_button.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class WelcomePage extends StatelessWidget {
+class WelcomePage extends StatefulWidget {
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+  WelcomePage({this.analytics, this.observer});
+  @override
+  _WelcomePageState createState() => _WelcomePageState();
+}
+
+class _WelcomePageState extends State<WelcomePage> {
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsFunction.sendAnalytics(
+        analytics: widget.analytics, screenName: "WELCOME SCREEN");
+  }
+
   @override
   Widget build(BuildContext context) {
     var config = Provider.of<AppProvider>(context);
@@ -93,7 +112,13 @@ class WelcomePage extends StatelessWidget {
               height: 30.0,
             ),
             Button(
-              onTap: () => push(context: context, page: BoardPage()),
+              onTap: () => push(
+                  context: context,
+                  page: BoardPage(
+                    analytics: widget.analytics,
+                    observer: widget.observer,
+                  ),
+                  pageName: onBoardPage),
               text: config.value == null
                   ? def_btn_welcome
                   : config.value?.getString(btn_welcome) ?? def_btn_welcome,
@@ -138,7 +163,13 @@ class WelcomePage extends StatelessWidget {
                     ),
                   ),
                   onTap: () {
-                    push(context: context, page: LoginPage());
+                    push(
+                        context: context,
+                        page: LoginPage(
+                          analytics: widget.analytics,
+                          observer: widget.observer,
+                        ),
+                        pageName: loginPage);
                   },
                 ),
               ],

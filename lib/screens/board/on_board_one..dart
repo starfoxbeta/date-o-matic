@@ -1,11 +1,29 @@
+import 'package:datematic/tools/analytic_function.dart';
 import 'package:datematic/tools/app_provider.dart';
 import 'package:datematic/tools/colors.dart';
 import 'package:datematic/tools/images.dart';
 import 'package:datematic/tools/remote_configuration.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class FirstOnBoardPage extends StatelessWidget {
+class FirstOnBoardPage extends StatefulWidget {
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+  FirstOnBoardPage({this.analytics, this.observer});
+  @override
+  _FirstOnBoardPageState createState() => _FirstOnBoardPageState();
+}
+
+class _FirstOnBoardPageState extends State<FirstOnBoardPage> {
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsFunction.sendAnalytics(
+        analytics: widget.analytics, screenName: "ONBOARD 1 SCREEN");
+  }
+
   @override
   Widget build(BuildContext context) {
     var config = Provider.of<AppProvider>(context);

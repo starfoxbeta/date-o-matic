@@ -30,6 +30,9 @@ FirebaseMessaging firebaseMessaging = FirebaseMessaging();
 // Referrer details
 const String referrerId = "referrerID";
 
+// Partner details
+const String partner = "partner";
+
 // quiz data
 String quiz1 = "quiz1";
 String quiz2 = "quiz2";
@@ -43,3 +46,15 @@ String answer = "answer";
 String zipcode = "zipcode";
 String citystate = "citystate";
 String planet = "planet";
+
+bool isQuizFinished = false;
+
+// pages name for analytics
+const String signUpPage = "Signup Page";
+const String quizPage = "Quiz Page";
+const String sharePartnerPage = "Share Partner Page";
+const String onBoardPage = "OnBoard Page";
+const String loginPage = "Login Page";
+const String confirmationPage = "Confirmation Page";
+const String homePage = "Content Page";
+const String emailPage = "Email Signup Page";

@@ -1,14 +1,20 @@
+import 'package:datematic/tools/analytic_function.dart';
 import 'package:datematic/tools/app_data.dart';
 import 'package:datematic/tools/app_provider.dart';
 import 'package:datematic/tools/colors.dart';
 import 'package:datematic/tools/images.dart';
+import 'package:datematic/tools/remote_configuration.dart';
 import 'package:datematic/widgets/widget_button.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class QuizThree extends StatefulWidget {
   final PageController controller;
-  QuizThree({this.controller});
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+  QuizThree({this.controller, this.analytics, this.observer});
   @override
   _QuizThreeState createState() => _QuizThreeState();
 }
@@ -16,8 +22,17 @@ class QuizThree extends StatefulWidget {
 class _QuizThreeState extends State<QuizThree> {
   RangeValues values = RangeValues(0, 2);
   String _quizQuestion = "How extra-ordinary do you want it to be?";
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsFunction.sendAnalytics(
+        analytics: widget.analytics, screenName: "QUIZ 3");
+  }
+
   @override
   Widget build(BuildContext context) {
+    var config = Provider.of<AppProvider>(context);
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 35.0),
       child: Column(
@@ -96,7 +111,10 @@ class _QuizThreeState extends State<QuizThree> {
                       textAlign: TextAlign.left,
                     ),
                     CommonText(
-                      text: "ie. dive bar, isolated restaurant",
+                      text: config.value == null
+                          ? def_str_low_key
+                          : config.value?.getString(str_low_key) ??
+                              def_str_low_key,
                       color: textColor,
                       textAlign: TextAlign.left,
                     ),
@@ -107,8 +125,10 @@ class _QuizThreeState extends State<QuizThree> {
                       textAlign: TextAlign.left,
                     ),
                     CommonText(
-                      text:
-                          "ie. Sky-diving, private serenade with private chef and fireworks",
+                      text: config.value == null
+                          ? def_str_extra_key
+                          : config.value?.getString(str_extra_key) ??
+                              def_str_extra_key,
                       color: textColor,
                       textAlign: TextAlign.left,
                     )

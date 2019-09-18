@@ -2,12 +2,17 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 
 class Config {
   Future<RemoteConfig> setupRemoteConfig() async {
-    final RemoteConfig remoteConfig = await RemoteConfig.instance;
-    remoteConfig.setConfigSettings(RemoteConfigSettings(debugMode: false));
-    remoteConfig.setDefaults(<String, dynamic>{});
-    await remoteConfig.fetch(expiration: const Duration(seconds: 0));
-    await remoteConfig.activateFetched();
-    return remoteConfig;
+    try {
+      final RemoteConfig remoteConfig = await RemoteConfig.instance;
+      remoteConfig.setConfigSettings(RemoteConfigSettings(debugMode: false));
+      remoteConfig.setDefaults(<String, dynamic>{});
+      await remoteConfig.fetch(expiration: const Duration(seconds: 0));
+      await remoteConfig.activateFetched();
+      return remoteConfig;
+    } catch (error) {
+      print(error);
+      return null;
+    }
   }
 }
 
@@ -28,6 +33,10 @@ const String str_sign_up_txt = "str_sign_up_txt";
 const String str_sign_up_txt1 = "str_sign_up_txt1";
 const String str_sign_up_txt2 = "str_sign_up_txt2";
 const String str_sign_up_txt3 = "str_sign_up_txt3";
+const String str_mood_low_energy = "low_energy_e";
+const String str_mood_high_energy = "high_energy_e";
+const String str_extra_key = "extra_key_e";
+const String str_low_key = "low_key_e";
 
 // To get the default data
 const String def_str_welcome = "Get your monthly date night";
@@ -42,3 +51,10 @@ const String def_str_sign_up_txt1 = "1 Monthly Date";
 const String def_str_sign_up_txt2 =
     "Chosen for you and your partner, curated by local experts";
 const String def_str_sign_up_txt3 = "HAPPINESS GUARANTEED";
+const String def_str_mood_low_energy =
+    "ie. spa, passages, lounges, films, picnics, etc.";
+const String def_str_mood_high_energy =
+    "i.e. concerts, skydiving, hiking, dancing, festivals, etc.";
+const String def_str_extra_key =
+    "ie. Sky-diving, private serenade with private chef and fireworks";
+const String def_str_low_key = "ie. dive bar, isolated restaurant";

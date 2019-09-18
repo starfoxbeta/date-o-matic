@@ -3,10 +3,15 @@ import 'package:datematic/screens/board/on_board_three.dart';
 import 'package:datematic/screens/board/on_board_two.dart';
 import 'package:datematic/tools/app_provider.dart';
 import 'package:datematic/tools/images.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class BoardPage extends StatelessWidget {
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+  BoardPage({this.analytics, this.observer});
   @override
   Widget build(BuildContext context) {
     var config = Provider.of<AppProvider>(context);
@@ -35,9 +40,18 @@ class BoardPage extends StatelessWidget {
             Expanded(
               child: PageView(
                 children: <Widget>[
-                  FirstOnBoardPage(),
-                  SecondOnBoardPage(),
-                  ThirdOnBoardPage(),
+                  FirstOnBoardPage(
+                    analytics: analytics,
+                    observer: observer,
+                  ),
+                  SecondOnBoardPage(
+                    analytics: analytics,
+                    observer: observer,
+                  ),
+                  ThirdOnBoardPage(
+                    analytics: analytics,
+                    observer: observer,
+                  ),
                 ],
               ),
             ),

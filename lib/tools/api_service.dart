@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:datematic/tools/app_data.dart';
 import 'package:datematic/tools/app_provider.dart';
+import 'package:datematic/tools/app_tools.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
@@ -92,15 +93,30 @@ class ApiService {
   static Future<String> sendToApi(FirebaseUser user) async {
     try {
       String token = await firebaseMessaging.getToken();
-      //String referrer = await getStringDataLocally(key: referrerId);
+      String referrer = await getStringDataLocally(key: referrerId);
+      bool isPartner = await getBoolDataLocally(key: partner);
+      if (referrer == null) {
+        referrer = "";
+      }
+      if (partner == null) {
+        isPartner = false;
+      }
       if (user != null && token != null) {
         http.Response response = await http.post(
           _url,
           body: json.encode(
-            {"email": user.email, "fcm_token": token, "uid": user.uid},
+            {
+              "email": user.email,
+              "fcm_token": token,
+              "uid": user.uid,
+              "referrerID": referrer,
+              "partner": isPartner,
+            },
           ),
         );
         if (response.statusCode == 200) {
+          removeDataLocally(key: referrerId);
+          removeDataLocally(key: partner);
           return successful;
         } else {
           return error;
@@ -114,14 +130,23 @@ class ApiService {
   }
 
 // This gets each user dynamic link
-  Future<void> createDynamicLink({bool short, String referrerId}) async {
+  Future<void> createDynamicLink({
+    bool short,
+    String referrerId,
+    bool isPartner = false,
+  }) async {
+    String appLogo =
+        "https://firebasestorage.googleapis.com/v0/b/domapp-f603e.appspot.com/o/LOGO.png?alt=media&token=01001de9-e973-4c68-bd72-5848cbeeb58e";
+    String getLink = isPartner
+        ? 'https://dynamic.link.example/$partner/$referrerId'
+        : 'https://dynamic.link.example/$referrerId';
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     final DynamicLinkParameters parameters = DynamicLinkParameters(
       uriPrefix: 'https://datematic.page.link',
-      link: Uri.parse('https://dynamic.link.example/$referrerId'),
+      link: Uri.parse(getLink),
       androidParameters: AndroidParameters(
         packageName: packageInfo.packageName,
-        minimumVersion: 21,
+        minimumVersion: 16,
       ),
       iosParameters: IosParameters(
         bundleId: packageInfo.packageName,
@@ -130,6 +155,12 @@ class ApiService {
       ),
       dynamicLinkParametersOptions: DynamicLinkParametersOptions(
         shortDynamicLinkPathLength: ShortDynamicLinkPathLength.short,
+      ),
+      socialMetaTagParameters: SocialMetaTagParameters(
+        title: "Datematic App",
+        description:
+            "Datematic get you a monthly date night with either your partner or a friend. A stress-free personalized date night is delivered to you fresh",
+        imageUrl: Uri.parse(appLogo),
       ),
     );
     Uri url;
@@ -160,6 +191,7 @@ class ApiService {
         });
         return successful;
       } on PlatformException catch (e) {
+        print(e);
         return error;
       }
     } else {

@@ -1,5 +1,6 @@
-import 'package:datematic/screens/home_page.dart';
-import 'package:datematic/screens/sign_up.dart';
+import 'package:datematic/screens/board/phone.dart';
+import 'package:datematic/screens/quiz/question.dart';
+import 'package:datematic/tools/analytic_function.dart';
 import 'package:datematic/tools/api_service.dart';
 import 'package:datematic/tools/app_data.dart';
 import 'package:datematic/tools/app_provider.dart';
@@ -8,10 +9,16 @@ import 'package:datematic/tools/colors.dart';
 import 'package:datematic/tools/images.dart';
 import 'package:datematic/tools/remote_configuration.dart';
 import 'package:datematic/tools/routes.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+  LoginPage({this.analytics, this.observer});
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -22,6 +29,13 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController passwordController = TextEditingController();
   FocusNode passwordFocus = FocusNode();
   GlobalKey<ScaffoldState> _globalKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsFunction.sendAnalytics(
+        analytics: widget.analytics, screenName: "LOGIN SCREEN");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -160,23 +174,26 @@ class _LoginPageState extends State<LoginPage> {
                     height: 32.0,
                   ),
                   GestureDetector(
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                          color: Color(0xFF2E5BFF),
-                          borderRadius: BorderRadius.circular(4.0)),
-                      child: Text(
-                        "Login",
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 16.0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            color: Color(0xFF2E5BFF),
+                            borderRadius: BorderRadius.circular(4.0)),
+                        child: Text(
+                          "Login",
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
-                    ),
-                    onTap: () => verifyLogin(),
-                  ),
+                      onTap: () {
+                        AnalyticsFunction.loginAnalytics(
+                            analytics: widget.analytics, loginMethod: "EMAIL");
+                        verifyLogin();
+                      }),
                 ],
               ),
             ),
@@ -207,7 +224,13 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   onTap: () {
-                    push(context: context, page: SignUpPage());
+                    push(
+                        context: context,
+                        page: PhonePage(
+                          analytics: widget.analytics,
+                          observer: widget.observer,
+                        ),
+                        pageName: signUpPage);
                   },
                 ),
               ],
@@ -222,36 +245,42 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   verifyLogin() async {
-    RegExp regExp = new RegExp(emailValidation);
-    if (emailController.text == "") {
-      showSnackBar(message: "Email field can not be empty", key: _globalKey);
-      return;
-    }
-    if (passwordController.text == "") {
-      showSnackBar(message: "Password field can not be empty", key: _globalKey);
-      return;
-    }
-    if (!regExp.hasMatch(emailController.text)) {
-      showSnackBar(message: "Incorrect email address", key: _globalKey);
-      return;
-    }
-    bool connect = await getBoolDataLocally(key: connection);
-    if (connect == false) {
-      showSnackBar(message: "No Internet Connection", key: _globalKey);
-      return;
-    }
-    displayProgressDialog(context);
-    var response = await ApiService.login(
-        email: emailController.text,
-        password: passwordController.text,
-        context: context);
+    SystemChannels.textInput
+        .invokeMethod('TextInput.hide')
+        .whenComplete(() async {
+      RegExp regExp = new RegExp(emailValidation);
+      if (emailController.text == "") {
+        showSnackBar(message: "Email field can not be empty", key: _globalKey);
+        return;
+      }
+      if (passwordController.text == "") {
+        showSnackBar(
+            message: "Password field can not be empty", key: _globalKey);
+        return;
+      }
+      if (!regExp.hasMatch(emailController.text)) {
+        showSnackBar(message: "Incorrect email address", key: _globalKey);
+        return;
+      }
+      bool connect = await getBoolDataLocally(key: connection);
+      if (connect == false) {
+        showSnackBar(message: "No Internet Connection", key: _globalKey);
+        return;
+      }
+      displayProgressDialog(context);
+      var response = await ApiService.login(
+          email: emailController.text,
+          password: passwordController.text,
+          context: context);
 
-    if (response == successful) {
-      closeProgressDialog(context);
-      pushAndRemove(context: context, page: HomePage());
-    } else {
-      closeProgressDialog(context);
-      showSnackBar(message: errorFunction(response), key: _globalKey);
-    }
+      if (response == successful) {
+        closeProgressDialog(context);
+        pushAndRemove(
+            context: context, page: QuestionPage(), pageName: quizPage);
+      } else {
+        closeProgressDialog(context);
+        showSnackBar(message: errorFunction(response), key: _globalKey);
+      }
+    });
   }
 }

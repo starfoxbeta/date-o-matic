@@ -1,14 +1,19 @@
+import 'package:datematic/tools/analytic_function.dart';
 import 'package:datematic/tools/app_data.dart';
 import 'package:datematic/tools/app_provider.dart';
 import 'package:datematic/tools/colors.dart';
 import 'package:datematic/tools/images.dart';
 import 'package:datematic/widgets/widget_button.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class QuizTwo extends StatefulWidget {
   final PageController controller;
-  QuizTwo({this.controller});
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+  QuizTwo({this.controller, this.analytics, this.observer});
   @override
   _QuizTwoState createState() => _QuizTwoState();
 }
@@ -16,6 +21,13 @@ class QuizTwo extends StatefulWidget {
 class _QuizTwoState extends State<QuizTwo> {
   RangeValues values = RangeValues(78, 250);
   String _quizQuestion = "How much do you want to spend?";
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsFunction.sendAnalytics(
+        analytics: widget.analytics, screenName: "QUIZ 2");
+  }
 
   @override
   Widget build(BuildContext context) {

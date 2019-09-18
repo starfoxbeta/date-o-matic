@@ -8,6 +8,12 @@ import 'package:flutter/material.dart';
 enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
 
 class QuizProvider {
+  bool _isWelcome = true;
+  bool get isWelcome => _isWelcome;
+  set setWelcome(bool value) {
+    _isWelcome = value;
+  }
+
   Map<String, dynamic> _q1;
   Map<String, dynamic> get q1 => _q1;
   set setQuiz1(Map value) {

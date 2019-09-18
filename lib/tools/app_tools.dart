@@ -207,6 +207,12 @@ getBoolDataLocally({String key}) async {
   return local.getBool(key);
 }
 
+removeDataLocally({String key}) async {
+  Future<SharedPreferences> saveLocal = SharedPreferences.getInstance();
+  final SharedPreferences local = await saveLocal;
+  local.remove(key);
+}
+
 clearDataLocally() async {
   Future<SharedPreferences> saveLocal = SharedPreferences.getInstance();
   final SharedPreferences local = await saveLocal;

@@ -1,11 +1,17 @@
 import 'package:datematic/screens/menu.dart';
+import 'package:datematic/tools/analytic_function.dart';
 import 'package:datematic/tools/app_provider.dart';
 import 'package:datematic/widgets/DatematicAppBar.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dialogflow/dialogflow_v2.dart';
 import 'package:provider/provider.dart';
 
 class HomePageDialogflow extends StatefulWidget {
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+  HomePageDialogflow({this.analytics, this.observer});
   @override
   _HomePageDialogflow createState() => new _HomePageDialogflow();
 }
@@ -14,6 +20,12 @@ class _HomePageDialogflow extends State<HomePageDialogflow> {
   final List<ChatMessage> _messages = <ChatMessage>[];
   final TextEditingController _textController = new TextEditingController();
   GlobalKey<ScaffoldState> _globalKey = GlobalKey();
+
+  void initState() {
+    super.initState();
+    AnalyticsFunction.sendAnalytics(
+        analytics: widget.analytics, screenName: "HELP");
+  }
 
   Widget _buildTextComposer() {
     return new IconTheme(
@@ -105,7 +117,10 @@ class _HomePageDialogflow extends State<HomePageDialogflow> {
             ),
           ],
         ),
-        drawer: Menu(),
+        drawer: Menu(
+          analytics: widget.analytics,
+          observer: widget.observer,
+        ),
       ),
     );
   }

@@ -1,14 +1,20 @@
+import 'package:datematic/tools/analytic_function.dart';
 import 'package:datematic/tools/app_data.dart';
 import 'package:datematic/tools/app_provider.dart';
 import 'package:datematic/tools/colors.dart';
 import 'package:datematic/tools/images.dart';
+import 'package:datematic/tools/remote_configuration.dart';
 import 'package:datematic/widgets/widget_button.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class QuizFour extends StatefulWidget {
   final PageController controller;
-  QuizFour({this.controller});
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+  QuizFour({this.controller, this.analytics, this.observer});
   @override
   _QuizFourState createState() => _QuizFourState();
 }
@@ -17,8 +23,17 @@ class _QuizFourState extends State<QuizFour> {
   RangeValues values = RangeValues(0, 2);
 
   String _quizQuestion = "What mood do you want?";
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsFunction.sendAnalytics(
+        analytics: widget.analytics, screenName: "QUIZ 4");
+  }
+
   @override
   Widget build(BuildContext context) {
+    var config = Provider.of<AppProvider>(context);
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 35.0),
       child: Column(
@@ -100,8 +115,10 @@ class _QuizFourState extends State<QuizFour> {
                         textAlign: TextAlign.left,
                       ),
                       CommonText(
-                        text:
-                            "ie. spa, passages, lounges, films, picnics, etc.",
+                        text: config.value == null
+                            ? def_str_mood_low_energy
+                            : config.value?.getString(str_mood_low_energy) ??
+                                def_str_mood_low_energy,
                         color: textColor,
                         textAlign: TextAlign.left,
                       ),
@@ -112,8 +129,10 @@ class _QuizFourState extends State<QuizFour> {
                         textAlign: TextAlign.left,
                       ),
                       CommonText(
-                        text:
-                            "i.e. concerts, skydiving, hiking, dancing, festivals, etc.",
+                        text: config.value == null
+                            ? def_str_mood_high_energy
+                            : config.value?.getString(str_mood_high_energy) ??
+                                def_str_mood_high_energy,
                         color: textColor,
                         textAlign: TextAlign.left,
                       )

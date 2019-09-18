@@ -1,13 +1,33 @@
 import 'package:datematic/screens/board/phone.dart';
+import 'package:datematic/tools/analytic_function.dart';
+import 'package:datematic/tools/app_data.dart';
 import 'package:datematic/tools/app_provider.dart';
 import 'package:datematic/tools/colors.dart';
 import 'package:datematic/tools/images.dart';
 import 'package:datematic/tools/remote_configuration.dart';
 import 'package:datematic/tools/routes.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ThirdOnBoardPage extends StatelessWidget {
+class ThirdOnBoardPage extends StatefulWidget {
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+  ThirdOnBoardPage({this.analytics, this.observer});
+
+  @override
+  _ThirdOnBoardPageState createState() => _ThirdOnBoardPageState();
+}
+
+class _ThirdOnBoardPageState extends State<ThirdOnBoardPage> {
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsFunction.sendAnalytics(
+        analytics: widget.analytics, screenName: "ONBOARD 3 SCREEN");
+  }
+
   @override
   Widget build(BuildContext context) {
     var config = Provider.of<AppProvider>(context);
@@ -63,7 +83,13 @@ class ThirdOnBoardPage extends StatelessWidget {
               ),
             ),
           ),
-          onTap: () => push(context: context, page: PhonePage()),
+          onTap: () => push(
+              context: context,
+              page: PhonePage(
+                analytics: widget.analytics,
+                observer: widget.observer,
+              ),
+              pageName: signUpPage),
         ),
         SizedBox(
           height: 50.0,

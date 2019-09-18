@@ -2,6 +2,7 @@ import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:datematic/screens/pin_creation_screen/pin_code_view.dart';
 import 'package:datematic/screens/quiz/question.dart';
 import 'package:datematic/screens/sign_up.dart';
+import 'package:datematic/tools/analytic_function.dart';
 import 'package:datematic/tools/api_service.dart';
 import 'package:datematic/tools/app_data.dart';
 import 'package:datematic/tools/app_provider.dart';
@@ -10,6 +11,8 @@ import 'package:datematic/tools/colors.dart';
 import 'package:datematic/tools/images.dart';
 import 'package:datematic/tools/routes.dart';
 import 'package:datematic/widgets/widget_button.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
@@ -17,6 +20,9 @@ import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
 class PhonePage extends StatefulWidget {
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+  PhonePage({this.analytics, this.observer});
   @override
   _PhonePageState createState() => _PhonePageState();
 }
@@ -43,6 +49,13 @@ class _PhonePageState extends State<PhonePage> {
     setState(() {
       valid = value;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsFunction.sendAnalytics(
+        analytics: widget.analytics, screenName: "SIGN UP SCREEN");
   }
 
   @override
@@ -96,6 +109,9 @@ class _PhonePageState extends State<PhonePage> {
                         width: 130.0,
                         margin: EdgeInsets.all(0.0),
                         onTap: () {
+                          AnalyticsFunction.signUpAnalytics(
+                              analytics: widget.analytics,
+                              signupMethod: "MOBILE");
                           verifyPhone(phoneNumber: phoneNumber);
                         },
                       ),
@@ -189,7 +205,13 @@ class _PhonePageState extends State<PhonePage> {
                           if (currentUser != null) {
                             ApiService.sendToApi(user);
                             pushReplacement(
-                                context: context, page: QuestionPage());
+                              context: context,
+                              page: QuestionPage(
+                                analytics: widget.analytics,
+                                observer: widget.observer,
+                              ),
+                              pageName: quizPage,
+                            );
                           }
                         } on PlatformException catch (e) {
                           showSnackBar(message: e.message, key: _key);
@@ -212,12 +234,13 @@ class _PhonePageState extends State<PhonePage> {
                 margin: EdgeInsets.all(20.0),
                 elevation: 5.0,
                 child: Container(
-                  height: 315.0,
+                  alignment: Alignment.center,
+                  height: MediaQuery.of(context).size.height * 0.5,
                   width: MediaQuery.of(context).size.width,
-                  padding: EdgeInsets.all(20.0),
+                  padding: EdgeInsets.only(left: 20.0, right: 20.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       SizedBox(
                         height: 10.0,
@@ -240,6 +263,9 @@ class _PhonePageState extends State<PhonePage> {
                               color: Colors.white,
                             )),
                         onPressed: () {
+                          AnalyticsFunction.signUpAnalytics(
+                              analytics: widget.analytics,
+                              signupMethod: "FACEBOOK");
                           comingSoonNotification();
                         },
                       ),
@@ -253,6 +279,9 @@ class _PhonePageState extends State<PhonePage> {
                               color: Colors.white,
                             )),
                         onPressed: () {
+                          AnalyticsFunction.signUpAnalytics(
+                              analytics: widget.analytics,
+                              signupMethod: "GOOGLE");
                           verifyGoogleSignIn();
                         },
                       ),
@@ -269,11 +298,21 @@ class _PhonePageState extends State<PhonePage> {
                           setState(() {
                             open = false;
                           });
-                          push(context: context, page: SignUpPage());
+                          push(
+                            context: context,
+                            page: SignUpPage(
+                              analytics: widget.analytics,
+                              observer: widget.observer,
+                            ),
+                            pageName: emailPage,
+                          );
                         },
                       ),
+                      SizedBox(
+                        height: 10.0,
+                      ),
                       Align(
-                        alignment: Alignment.bottomRight,
+                        alignment: Alignment.topRight,
                         child: FlatButton(
                           child: Text("Close",
                               style: TextStyle(
@@ -310,7 +349,14 @@ class _PhonePageState extends State<PhonePage> {
     String response = await ApiService.googleSignIn();
     if (response == successful) {
       closeProgressDialog(context);
-      pushReplacement(context: context, page: QuestionPage());
+      pushReplacement(
+        context: context,
+        page: QuestionPage(
+          analytics: widget.analytics,
+          observer: widget.observer,
+        ),
+        pageName: quizPage,
+      );
     } else if (response == error) {
       closeProgressDialog(context);
       showSnackBar(
@@ -348,7 +394,14 @@ class _PhonePageState extends State<PhonePage> {
       closeProgressDialog(context);
       if (user != null) {
         ApiService.sendToApi(user);
-        pushReplacement(context: context, page: QuestionPage());
+        pushReplacement(
+          context: context,
+          page: QuestionPage(
+            analytics: widget.analytics,
+            observer: widget.observer,
+          ),
+          pageName: quizPage,
+        );
       }
     };
 

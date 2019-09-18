@@ -1,20 +1,33 @@
+import 'package:datematic/tools/analytic_function.dart';
 import 'package:datematic/tools/app_data.dart';
 import 'package:datematic/tools/app_provider.dart';
 import 'package:datematic/tools/colors.dart';
 import 'package:datematic/tools/images.dart';
 import 'package:datematic/widgets/widget_button.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class QuizFive extends StatefulWidget {
   final PageController controller;
-  QuizFive({this.controller});
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+  QuizFive({this.controller, this.analytics, this.observer});
   @override
   _QuizFiveState createState() => _QuizFiveState();
 }
 
 class _QuizFiveState extends State<QuizFive> {
   String _quizQuestion = "Which styles best describe you?";
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsFunction.sendAnalytics(
+        analytics: widget.analytics, screenName: "QUIZ 5");
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(

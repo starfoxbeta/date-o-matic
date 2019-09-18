@@ -6,6 +6,8 @@ import 'package:datematic/tools/app_data.dart';
 import 'package:datematic/tools/app_provider.dart';
 import 'package:datematic/tools/app_tools.dart';
 import 'package:datematic/tools/remote_configuration.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +18,9 @@ import 'package:provider/provider.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalyticsObserver observer =
+      FirebaseAnalyticsObserver(analytics: analytics);
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -56,7 +61,8 @@ class MyApp extends StatelessWidget {
             scaffoldBackgroundColor: Colors.white,
             fontFamily: "Rubik",
           ),
-          home: NavigationPage(),
+          navigatorObservers: <NavigatorObserver>[observer],
+          home: NavigationPage(analytics: analytics, observer: observer),
         ),
       ),
     );
@@ -64,6 +70,9 @@ class MyApp extends StatelessWidget {
 }
 
 class NavigationPage extends StatefulWidget {
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+  NavigationPage({this.analytics, this.observer});
   @override
   _NavigationPageState createState() => _NavigationPageState();
 }
@@ -72,6 +81,7 @@ class _NavigationPageState extends State<NavigationPage> {
   @override
   void initState() {
     super.initState();
+    widget.analytics.setAnalyticsCollectionEnabled(true);
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     _retrieveDynamicLink();
@@ -86,8 +96,11 @@ class _NavigationPageState extends State<NavigationPage> {
       stream: value?.setupRemoteConfig()?.asStream(),
       builder: (context, snapshot) {
         config.setRemote = snapshot?.data;
-
-        return user == null ? WelcomePage() : QuestionPage();
+        return user == null
+            ? WelcomePage(
+                analytics: widget.analytics, observer: widget.observer)
+            : QuestionPage(
+                analytics: widget.analytics, observer: widget.observer);
       },
     );
   }
@@ -99,16 +112,26 @@ class _NavigationPageState extends State<NavigationPage> {
     final Uri deepLink = data?.link;
     if (deepLink != null) {
       String path = deepLink.path.toString().substring(1);
+      if (path.contains(partner)) {
+        writeBoolDataLocally(key: partner, value: true);
+        path = deepLink.path.toString().substring(9);
+      } else {
+        path = deepLink.path.toString().substring(1);
+      }
       writeStringDataLocally(key: referrerId, value: path);
-      print(await getStringDataLocally(key: referrerId));
     }
     FirebaseDynamicLinks.instance.onLink(
       onSuccess: (PendingDynamicLinkData dynamicLink) async {
         final Uri deepLink = dynamicLink?.link;
         if (deepLink != null) {
           String path = deepLink.path.toString().substring(1);
+          if (path.contains(partner)) {
+            writeBoolDataLocally(key: partner, value: true);
+            path = deepLink.path.toString().substring(9);
+          } else {
+            path = deepLink.path.toString().substring(1);
+          }
           writeStringDataLocally(key: referrerId, value: path);
-          print(await getStringDataLocally(key: referrerId));
         }
       },
       onError: (OnLinkErrorException e) async {

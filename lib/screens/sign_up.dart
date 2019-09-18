@@ -1,17 +1,24 @@
 import 'package:datematic/screens/quiz/question.dart';
+import 'package:datematic/tools/analytic_function.dart';
 import 'package:datematic/tools/api_service.dart';
 import 'package:datematic/tools/app_provider.dart';
 import 'package:datematic/tools/colors.dart';
 import 'package:datematic/tools/images.dart';
 import 'package:datematic/tools/remote_configuration.dart';
 import 'package:datematic/tools/routes.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:datematic/screens/login_page.dart';
 import 'package:datematic/tools/app_data.dart';
 import 'package:datematic/tools/app_tools.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class SignUpPage extends StatefulWidget {
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+  SignUpPage({this.analytics, this.observer});
   @override
   _SignUpPageState createState() => _SignUpPageState();
 }
@@ -246,7 +253,11 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                     ),
-                    onTap: () => verifyDetails(context),
+                    onTap: () {
+                      AnalyticsFunction.signUpAnalytics(
+                          analytics: widget.analytics, signupMethod: "EMAIL");
+                      verifyDetails(context);
+                    },
                   ),
                   SizedBox(
                     height: 12.0,
@@ -274,7 +285,13 @@ class _SignUpPageState extends State<SignUpPage> {
                             color: Color(0xFF2E5BFF),
                           ),
                         ),
-                        onTap: () => push(context: context, page: LoginPage()),
+                        onTap: () => push(
+                            context: context,
+                            page: LoginPage(
+                              analytics: widget.analytics,
+                              observer: widget.observer,
+                            ),
+                            pageName: loginPage),
                       ),
                     ],
                   ),
@@ -293,40 +310,52 @@ class _SignUpPageState extends State<SignUpPage> {
   verifyDetails(
     BuildContext context,
   ) async {
-    RegExp emailExp = new RegExp(emailValidation);
-    if (emailController.text == "") {
-      showSnackBar(message: "Email field can not be empty", key: _globalKey);
-      return;
-    }
-    if (passwordController.text == "") {
-      showSnackBar(message: "Password field can not be empty", key: _globalKey);
-      return;
-    }
-    if (!emailExp.hasMatch(emailController.text)) {
-      showSnackBar(message: "Incorrect email address", key: _globalKey);
-      return;
-    }
-    bool connect = await getBoolDataLocally(key: connection);
-    if (connect == false) {
-      showSnackBar(message: "No Internet Connection", key: _globalKey);
-      return;
-    }
-    displayProgressDialog(context);
-    String response = await ApiService.signUp(
-      email: emailController.text,
-      password: passwordController.text,
-    );
-    if (response == successful) {
-      closeProgressDialog(context);
-      pushReplacement(context: context, page: QuestionPage());
-      print("success");
-    } else if (response == error) {
-      closeProgressDialog(context);
-      showSnackBar(
-          message: "User account could not be created", key: _globalKey);
-    } else {
-      closeProgressDialog(context);
-      showSnackBar(message: response, key: _globalKey);
-    }
+    SystemChannels.textInput
+        .invokeMethod('TextInput.hide')
+        .whenComplete(() async {
+      RegExp emailExp = new RegExp(emailValidation);
+      if (emailController.text == "") {
+        showSnackBar(message: "Email field can not be empty", key: _globalKey);
+        return;
+      }
+      if (passwordController.text == "") {
+        showSnackBar(
+            message: "Password field can not be empty", key: _globalKey);
+        return;
+      }
+      if (!emailExp.hasMatch(emailController.text)) {
+        showSnackBar(message: "Incorrect email address", key: _globalKey);
+        return;
+      }
+      bool connect = await getBoolDataLocally(key: connection);
+      if (connect == false) {
+        showSnackBar(message: "No Internet Connection", key: _globalKey);
+        return;
+      }
+      displayProgressDialog(context);
+      String response = await ApiService.signUp(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+      if (response == successful) {
+        closeProgressDialog(context);
+        pushReplacement(
+          context: context,
+          page: QuestionPage(
+            analytics: widget.analytics,
+            observer: widget.observer,
+          ),
+          pageName: quizPage,
+        );
+        print("success");
+      } else if (response == error) {
+        closeProgressDialog(context);
+        showSnackBar(
+            message: "User account could not be created", key: _globalKey);
+      } else {
+        closeProgressDialog(context);
+        showSnackBar(message: response, key: _globalKey);
+      }
+    });
   }
 }
